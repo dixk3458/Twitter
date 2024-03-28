@@ -17,19 +17,19 @@ let posts = [
   },
 ];
 
-export function getAllByUsername(username) {
+export async function getAllByUsername(username) {
   return posts.filter(post => post.username === username);
 }
 
-export function getAll() {
+export async function getAll() {
   return posts;
 }
 
-export function get(id) {
+export async function get(id) {
   return posts.find(post => post.id === id);
 }
 
-export function create(text, username, name) {
+export async function create(text, username, name) {
   const newPost = {
     id: Date.now().toString(),
     text: text,
@@ -43,7 +43,7 @@ export function create(text, username, name) {
   return newPost;
 }
 
-export function update(id, text) {
+export async function update(id, text) {
   const post = posts.find(post => post.id === id);
   if (post) {
     post.text = text;
@@ -52,6 +52,6 @@ export function update(id, text) {
   return post;
 }
 
-export function remove(id) {
+export async function remove(id) {
   posts = posts.filter(post => post.id !== id);
 }
