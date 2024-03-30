@@ -5,7 +5,7 @@ const AUTH_ERROR = { message: 'Authentication Error' };
 
 export const isAuth = async (req, res, next) => {
   const authHeader = req.get('Authorization'); // 헤더에 있는 Authorization 키를 확인해줌
-  if (!(authHeader && authHeader.startWith('Bearer'))) {
+  if (!(authHeader && authHeader.startsWith('Bearer'))) {
     return res.status(401).json(AUTH_ERROR);
   }
 
@@ -15,9 +15,10 @@ export const isAuth = async (req, res, next) => {
     'c^MQU9E^vPhpF2#u67G@g4%tafZfd5RI',
     async (error, decoded) => {
       if (error) {
+        console.log(token);
         return res.status(401).json(AUTH_ERROR);
       }
-      const user = await userRepository.findByUserId(decoded.id);
+      const user = await userRepository.findById(decoded.id);
       if (!user) {
         return res.status(401).json(AUTH_ERROR);
       }

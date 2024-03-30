@@ -1,46 +1,61 @@
+import * as userRepository from '../data/auth.js';
+
 let posts = [
   {
     id: '1',
-    text: '정재웅 포스트',
-    createdAt: Date.now().toString(),
-    name: 'Jaewoong',
-    username: 'jaewoong3458',
-    url: 'https://images.unsplash.com/photo-1618695537407-d2a1a57ecc9b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDJ8SnI2ZkFNdGZjaVV8fGVufDB8fHx8fA%3D%3D',
+    text: '남도형 포스트 1',
+    createdAt: new Date().toString(),
+    userId: '1',
   },
   {
     id: '2',
-    text: '남도형 포스트',
-    createdAt: Date.now().toString(),
-    name: 'Dohyeong',
-    username: 'dohyeong3458',
-    url: 'https://images.unsplash.com/photo-1618695537407-d2a1a57ecc9b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDJ8SnI2ZkFNdGZjaVV8fGVufDB8fHx8fA%3D%3D',
+    text: '남도형 포스트 2',
+    createdAt: new Date().toString(),
+    userId: '1',
   },
 ];
 
 export async function getAllByUsername(username) {
-  return posts.filter(post => post.username === username);
+  return getAll().then(posts =>
+    posts.filter(post => post.username === username)
+  );
+}
+
+export async function getById(id) {
+  const found = posts.find(post => post.id === id);
+  if (!found) {
+    return null;
+  }
+
+  const { username, name, url } = await userRepository.findById(found.userId);
+  return { ...found, username, name, url }; // post에 대한 데이터 + 사용자 정보를 더해서 준다.
 }
 
 export async function getAll() {
-  return posts;
+  return Promise.all(
+    posts.map(async post => {
+      const { username, name, url } = await userRepository.findById(
+        post.userId
+      );
+      return { ...post, username, name, url };
+    })
+  );
 }
 
 export async function get(id) {
   return posts.find(post => post.id === id);
 }
 
-export async function create(text, username, name) {
-  const newPost = {
-    id: Date.now().toString(),
+export async function create(text, userId) {
+  const post = {
+    id: new Date().toString(), // post 고유 id
     text: text,
     createdAt: new Date(),
-    name: name,
-    username: username,
+    userId: userId,
   };
 
-  posts = [newPost, ...posts];
-
-  return newPost;
+  posts = [post, ...posts];
+  return getById(post.id);
 }
 
 export async function update(id, text) {
@@ -49,7 +64,7 @@ export async function update(id, text) {
     post.text = text;
   }
 
-  return post;
+  return getById(post.id);
 }
 
 export async function remove(id) {

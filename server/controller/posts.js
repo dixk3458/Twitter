@@ -33,15 +33,7 @@ export async function createPost(req, res, next) {
 
   const { text, username, name } = req.body;
 
-  if (!text || !username || !name) {
-    // 한개라도 없다면 Bad Request
-    res.status(400).json({
-      message: `Bad Request - {text : ${text}, username : ${username}, name : ${name}}`,
-    });
-    return;
-  }
-
-  const newPost = await postsRepository.create(text, username, name);
+  const newPost = await postsRepository.create(text, req.userId);
 
   res.status(201).json(newPost);
 }
