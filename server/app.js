@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import postsRouter from './router/posts.js';
+import authRouter from './router/auth.js';
 
 // app을 만들고 필요한 라우터를 불러오자
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(morgan('tiny'));
 
 app.use('/posts', postsRouter);
+app.use('/auth', authRouter);
 
 // 애플리케이션에서 처리해줄 수 없는 URL이라면 Not Found
 app.use((req, res, next) => {
