@@ -48,7 +48,7 @@ export async function get(id) {
 
 export async function create(text, userId) {
   const post = {
-    id: new Date().toString(), // post 고유 id
+    id: Date.now().toString(), // post 고유 id
     text: text,
     createdAt: new Date(),
     userId: userId,

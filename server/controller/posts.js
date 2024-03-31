@@ -42,10 +42,21 @@ export async function updatePost(req, res, next) {
   const id = req.params.id;
 
   const text = req.body.text;
-  const post = await postsRepository.update(id, text);
 
-  if (post) {
-    res.status(200).json(post);
+  const post = await postsRepository.getById(id);
+
+  if (!post) {
+    return res.sendStatus(404);
+  }
+
+  if (post.userId !== req.userId) {
+    return res.sendStatus(403);
+  }
+
+  const updated = await postsRepository.update(id, text);
+
+  if (updated) {
+    res.status(200).json(updated);
   } else {
     res.status(404).json({ message: `Post id(${id}) not found` });
   }
@@ -53,6 +64,16 @@ export async function updatePost(req, res, next) {
 
 export async function removePost(req, res, next) {
   const id = req.params.id;
+
+  const post = await postsRepository.getById(id);
+
+  if (!post) {
+    return res.sendStatus(404);
+  }
+
+  if (post.userId !== req.userId) {
+    return res.sendStatus(403);
+  }
 
   await postsRepository.remove(id);
   res.sendStatus(204);
