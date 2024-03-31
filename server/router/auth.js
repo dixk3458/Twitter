@@ -33,7 +33,7 @@ const validateSignup = [
     .trim()
     .isURL()
     .withMessage('invalid URL')
-    .optional({ values: null }),
+    .optional({ values: 'falsy' }),
   validate,
 ];
 
