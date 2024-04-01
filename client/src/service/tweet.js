@@ -1,7 +1,8 @@
 export default class TweetService {
-  constructor(httpClient, tokenStorage) {
+  constructor(httpClient, tokenStorage, socket) {
     this.httpClient = httpClient;
     this.tokenStorage = tokenStorage;
+    this.socket = socket;
   }
 
   async getTweets(username) {
@@ -46,5 +47,9 @@ export default class TweetService {
     return {
       Authorization: `Bearer ${token}`,
     };
+  }
+
+  onSync(callback) {
+    return this.socket.onSync('posts', callback);
   }
 }

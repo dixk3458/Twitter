@@ -3,7 +3,16 @@ let users = [
     id: '1',
     username: 'dohyeong1521',
     password: '$2b$12$CWJdcbBhbwrBiMiDL2F0EOwWzYgDZyoQHZWPW8jOZfoEx.eRvDg7u', // skaehgud1521@
+    name: '남도형',
     email: 'skaehgud1521@naver.com',
+    url: 'https://images.unsplash.com/photo-1707343846292-0c11438d145f?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHx8',
+  },
+  {
+    id: '2',
+    username: 'wodnd3458',
+    password: '$2b$12$CWJdcbBhbwrBiMiDL2F0EOwWzYgDZyoQHZWPW8jOZfoEx.eRvDg7u', // skaehgud1521@
+    name: '정재웅',
+    email: 'wodnd3458@naver.com',
     url: 'https://images.unsplash.com/photo-1707343846292-0c11438d145f?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHx8',
   },
 ];
