@@ -5,6 +5,7 @@ import morgan from 'morgan';
 
 import postsRouter from './router/posts.js';
 import authRouter from './router/auth.js';
+import { config } from './config.js';
 
 // app을 만들고 필요한 라우터를 불러오자
 const app = express();
@@ -28,4 +29,4 @@ app.use((error, req, res, next) => {
   res.sendStatus(500);
 });
 
-app.listen(8080);
+app.listen(config.host.port);

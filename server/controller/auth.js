@@ -1,10 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as userRepository from '../data/auth.js';
-
-const bcryptSaltRounds = 12;
-const jwtSecretKey = 'c^MQU9E^vPhpF2#u67G@g4%tafZfd5RI';
-const jwtExpireInDays = '2d';
+import { config } from '../config.js';
 
 export async function signup(req, res, next) {
   const { username, password, name, email, url } = req.body;
@@ -18,7 +15,7 @@ export async function signup(req, res, next) {
   }
 
   // 없다면 회원가입을 진행
-  const hashed = await bcrypt.hash(password, bcryptSaltRounds);
+  const hashed = await bcrypt.hash(password, config.bcrypt.saltRounds);
   const userId = await userRepository.createUser({
     username: username,
     password: hashed,
@@ -59,5 +56,7 @@ export async function me(req, res, next) {
 }
 
 function createJwtToken(id) {
-  return jwt.sign({ id }, jwtSecretKey, { expiresIn: jwtExpireInDays });
+  return jwt.sign({ id }, config.jwt.secretKey, {
+    expiresIn: config.jwt.expiresInSec,
+  });
 }
