@@ -1,72 +1,58 @@
 import * as userRepository from '../data/auth.js';
+import { db } from '../db/database.js';
 
-let posts = [
-  {
-    id: '1',
-    text: '남도형 포스트 1',
-    createdAt: new Date().toString(),
-    userId: '1',
-  },
-  {
-    id: '2',
-    text: '남도형 포스트 2',
-    createdAt: new Date().toString(),
-    userId: '1',
-  },
-];
+const SELECT_JOIN = `SELECT po.id, po.text, po.createdAt, po.userid, us.username, us.name, us.url 
+                    FROM post as po JOIN user as us 
+                    ON po.userid = us.id`;
+
+const ORDER_DESC = 'ORDER BY po.createdAt DESC';
+// 두개의 연관있는 테이블을 조인해서 읽어야한다.
+export async function getAll() {
+  return db.execute(`${SELECT_JOIN} ${ORDER_DESC}`).then(result => result[0]);
+}
 
 export async function getAllByUsername(username) {
-  return getAll().then(posts =>
-    posts.filter(post => post.username === username)
-  );
+  return db
+    .execute(`${SELECT_JOIN} WHERE username = ? ${ORDER_DESC}`, [username])
+    .then(result => result[0]);
 }
 
 export async function getById(id) {
-  const found = posts.find(post => post.id === id);
-  if (!found) {
-    return null;
-  }
-
-  const { username, name, url } = await userRepository.findById(found.userId);
-  return { ...found, username, name, url }; // post에 대한 데이터 + 사용자 정보를 더해서 준다.
-}
-
-export async function getAll() {
-  return Promise.all(
-    posts.map(async post => {
-      const { username, name, url } = await userRepository.findById(
-        post.userId
-      );
-      return { ...post, username, name, url };
-    })
-  );
-}
-
-export async function get(id) {
-  return posts.find(post => post.id === id);
+  return db
+    .execute(`${SELECT_JOIN} WHERE po.id = ? ${ORDER_DESC}`, [id])
+    .then(result => result[0][0]);
 }
 
 export async function create(text, userId) {
-  const post = {
-    id: Date.now().toString(), // post 고유 id
-    text: text,
-    createdAt: new Date(),
-    userId: userId,
-  };
-
-  posts = [post, ...posts];
-  return getById(post.id);
+  return db
+    .execute(
+      `
+  INSERT INTO post (text,createdAt,userid)  
+  VALUES (?,?,?)
+ `,
+      [text, new Date(), userId]
+    )
+    .then(result => getById(result[0].insertId));
 }
 
 export async function update(id, text) {
-  const post = posts.find(post => post.id === id);
-  if (post) {
-    post.text = text;
-  }
-
-  return getById(post.id);
+  return db
+    .execute(
+      `
+    UPDATE post
+    SET text = ?
+    WHERE id = ?
+  `,
+      [text, id]
+    ) //
+    .then(() => getById(id));
 }
 
 export async function remove(id) {
-  posts = posts.filter(post => post.id !== id);
+  return db.execute(
+    `
+    DELETE FROM post WHERE id = ?
+  `,
+    [id]
+  );
 }

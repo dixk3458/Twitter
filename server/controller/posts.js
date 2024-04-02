@@ -18,7 +18,7 @@ export async function getPost(req, res, next) {
 
   // 만약 해당 id에 해당하는 post가 없다면 not found해야함
 
-  const post = await postsRepository.get(id);
+  const post = await postsRepository.getById(id);
 
   if (post) {
     res.status(200).send(post);
@@ -52,7 +52,7 @@ export async function updatePost(req, res, next) {
     return res.sendStatus(404);
   }
 
-  if (post.userId !== req.userId) {
+  if (post.userid !== req.userId) {
     return res.sendStatus(403);
   }
 
@@ -74,7 +74,7 @@ export async function removePost(req, res, next) {
     return res.sendStatus(404);
   }
 
-  if (post.userId !== req.userId) {
+  if (post.userid !== req.userId) {
     return res.sendStatus(403);
   }
 
