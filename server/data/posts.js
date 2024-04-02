@@ -1,58 +1,98 @@
-import * as userRepository from '../data/auth.js';
-import { db } from '../db/database.js';
+import SQ from 'sequelize';
 
-const SELECT_JOIN = `SELECT po.id, po.text, po.createdAt, po.userid, us.username, us.name, us.url 
-                    FROM post as po JOIN user as us 
-                    ON po.userid = us.id`;
+import { User } from '../data/auth.js';
+import { db, sequelize } from '../db/database.js';
 
-const ORDER_DESC = 'ORDER BY po.createdAt DESC';
+const DataTypes = SQ.DataTypes;
+const Sequelize = SQ.Sequelize;
+
+const Post = sequelize.define('post', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    unique: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  text: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+});
+
+// 존속된다. 자동으로 user의 primary key인 userid를 외래키로 사용한다.
+Post.belongsTo(User);
+
+const INCLUDE_USER = {
+  attributes: [
+    'id',
+    'text',
+    'createdAt',
+    'userId',
+    [Sequelize.col('user.username'), 'username'],
+    [Sequelize.col('user.name'), 'name'],
+    [Sequelize.col('user.url'), 'url'],
+  ],
+  include: { model: User, attributes: [] },
+};
+
+const ORDER_DESC = {
+  order: [['createdAt', 'DESC']],
+};
 // 두개의 연관있는 테이블을 조인해서 읽어야한다.
 export async function getAll() {
-  return db.execute(`${SELECT_JOIN} ${ORDER_DESC}`).then(result => result[0]);
+  return Post.findAll({
+    ...INCLUDE_USER,
+    ...ORDER_DESC,
+  });
 }
 
 export async function getAllByUsername(username) {
-  return db
-    .execute(`${SELECT_JOIN} WHERE username = ? ${ORDER_DESC}`, [username])
-    .then(result => result[0]);
+  return Post.findAll({
+    ...INCLUDE_USER,
+    ...ORDER_DESC,
+    include: { ...INCLUDE_USER.include, where: { username: username } },
+  });
 }
 
 export async function getById(id) {
-  return db
-    .execute(`${SELECT_JOIN} WHERE po.id = ? ${ORDER_DESC}`, [id])
-    .then(result => result[0][0]);
+  return Post.findOne({
+    ...INCLUDE_USER,
+    where: { id: id },
+  });
 }
 
 export async function create(text, userId) {
-  return db
-    .execute(
-      `
-  INSERT INTO post (text,createdAt,userid)  
-  VALUES (?,?,?)
- `,
-      [text, new Date(), userId]
-    )
-    .then(result => getById(result[0].insertId));
+  return Post.create({ text, userId }).then(data =>
+    getById(data.dataValues.id)
+  );
 }
 
 export async function update(id, text) {
-  return db
-    .execute(
-      `
-    UPDATE post
-    SET text = ?
-    WHERE id = ?
-  `,
-      [text, id]
-    ) //
-    .then(() => getById(id));
+  // return Post.findByPk(id, INCLUDE_USER).then(post => {
+  //   post.text = text;
+  //   return post.save(); // 업데이트된 post 자신을 반환해준다.
+  // });
+
+  return Post.update(
+    {
+      text: text,
+    },
+    {
+      where: {
+        id: id,
+      },
+    }
+  ).then(() => getById(id));
 }
 
 export async function remove(id) {
-  return db.execute(
-    `
-    DELETE FROM post WHERE id = ?
-  `,
-    [id]
-  );
+  // return Post.findByPk(id).then(post => {
+  //   post.destroy();
+  // });
+  return Post.destroy({
+    where: {
+      id: id,
+    },
+  });
 }

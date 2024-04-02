@@ -52,7 +52,7 @@ export async function updatePost(req, res, next) {
     return res.sendStatus(404);
   }
 
-  if (post.userid !== req.userId) {
+  if (post.userId !== req.userId) {
     return res.sendStatus(403);
   }
 
@@ -74,7 +74,7 @@ export async function removePost(req, res, next) {
     return res.sendStatus(404);
   }
 
-  if (post.userid !== req.userId) {
+  if (post.userId !== req.userId) {
     return res.sendStatus(403);
   }
 

@@ -3,36 +3,40 @@ import { db, sequelize } from '../db/database.js';
 
 const DataTypes = SQ.DataTypes;
 
-const User = sequelize.define('user', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-    unique: true,
-    allowNull: false,
+export const User = sequelize.define(
+  'user',
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      unique: true,
+      allowNull: false,
+    },
+    username: {
+      type: DataTypes.STRING(45),
+      unique: true,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    url: {
+      type: TEXT,
+      allowNull: true,
+    },
   },
-  username: {
-    type: DataTypes.STRING(45),
-    unique: true,
-    allowNull: false,
-  },
-  password: {
-    type: DataTypes.STRING(128),
-    allowNull: false,
-  },
-  name: {
-    type: DataTypes.STRING(45),
-    allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING(128),
-    allowNull: false,
-  },
-  url: {
-    type: TEXT,
-    allowNull: true,
-  },
-});
+  { timestamps: false }
+);
 
 export async function findByUsername(username) {
   return User.findOne({ where: { username: username } });
