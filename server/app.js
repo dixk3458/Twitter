@@ -7,6 +7,7 @@ import postsRouter from './router/posts.js';
 import authRouter from './router/auth.js';
 import { config } from './config.js';
 import { initSocket } from './connection/socket.js';
+import { connectDB } from './db/database.js';
 
 // app을 만들고 필요한 라우터를 불러오자
 const app = express();
@@ -30,5 +31,11 @@ app.use((error, req, res, next) => {
   res.sendStatus(500);
 });
 
-const server = app.listen(config.host.port);
-initSocket(server);
+connectDB()
+  .then(() => {
+    const server = app.listen(config.host.port);
+    initSocket(server);
+  })
+  .catch(error => {
+    console.log(error);
+  });
