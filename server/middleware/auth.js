@@ -20,6 +20,7 @@ export const isAuth = async (req, res, next) => {
       return res.status(401).json(AUTH_ERROR);
     }
     req.userId = user.id; // 앞으로의 요청에서 계속 사용해야하기때문에 커스텀 데이터 등록
+    req.token = token;
     next();
   });
 };

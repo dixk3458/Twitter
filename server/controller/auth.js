@@ -8,6 +8,8 @@ export async function signup(req, res, next) {
   // 회원가입은 이미 존재하는 아이디를 중복해서 생성할 수 없다.
   const found = await userRepository.findByUsername(username);
 
+  console.log('ddd');
+
   if (found) {
     // 중복된 유저
     // 409에러 = 서버 데이터 충돌

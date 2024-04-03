@@ -21,8 +21,6 @@ export default class TweetService {
       headers: this.getHeaders(),
       body: JSON.stringify({
         text: text,
-        name: 'Ellie',
-        username: 'ellie',
       }),
     });
   }

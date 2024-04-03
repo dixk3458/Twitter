@@ -28,4 +28,8 @@ export const config = {
     password: required('DB_PASSWORD'),
     database: required('DB_DATABASE', 'twitter'),
   },
+  port: parseInt(required('PORT', 8080)),
+  cors: {
+    allowedOrigin: required('CORS_ALLOW_ORIGIN'),
+  },
 };

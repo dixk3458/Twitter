@@ -2,7 +2,7 @@ import * as userRepository from '../data/auth.js';
 import { db } from '../db/database.js';
 
 const SELECT_JOIN = `SELECT po.id, po.text, po.createdAt, po.userid, us.username, us.name, us.url 
-                    FROM post as po JOIN user as us 
+                    FROM posts as po JOIN users as us 
                     ON po.userid = us.id`;
 
 const ORDER_DESC = 'ORDER BY po.createdAt DESC';
@@ -27,7 +27,7 @@ export async function create(text, userId) {
   return db
     .execute(
       `
-  INSERT INTO post (text,createdAt,userid)  
+  INSERT INTO posts (text,createdAt,userid)  
   VALUES (?,?,?)
  `,
       [text, new Date(), userId]
@@ -39,7 +39,7 @@ export async function update(id, text) {
   return db
     .execute(
       `
-    UPDATE post
+    UPDATE posts
     SET text = ?
     WHERE id = ?
   `,
@@ -51,7 +51,7 @@ export async function update(id, text) {
 export async function remove(id) {
   return db.execute(
     `
-    DELETE FROM post WHERE id = ?
+    DELETE FROM posts WHERE id = ?
   `,
     [id]
   );

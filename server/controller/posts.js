@@ -32,7 +32,7 @@ export async function createPost(req, res, next) {
   // body에 대한 정보를 받아와야한다.
   // 유효성 검사?
 
-  const { text, username, name } = req.body;
+  const { text } = req.body;
 
   const newPost = await postsRepository.create(text, req.userId);
 
