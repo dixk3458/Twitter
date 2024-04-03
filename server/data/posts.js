@@ -1,72 +1,68 @@
 import * as userRepository from '../data/auth.js';
+import { getPosts } from '../db/database.js';
 
-let posts = [
-  {
-    id: '1',
-    text: '남도형 포스트 1',
-    createdAt: new Date().toString(),
-    userId: '1',
-  },
-  {
-    id: '2',
-    text: '남도형 포스트 2',
-    createdAt: new Date().toString(),
-    userId: '1',
-  },
-];
+import MongoDB from 'mongodb';
+
+const ObjectId = MongoDB.ObjectId;
+
+export async function getAll() {
+  return getPosts()
+    .find()
+    .sort({ createdAt: -1 })
+    .toArray()
+    .then(data => mapPosts(data));
+}
 
 export async function getAllByUsername(username) {
-  return getAll().then(posts =>
-    posts.filter(post => post.username === username)
-  );
+  return getPosts()
+    .find({ username: username })
+    .sort({ createdAt: -1 })
+    .toArray()
+    .then(data => mapPosts(data));
 }
 
 export async function getById(id) {
-  const found = posts.find(post => post.id === id);
-  if (!found) {
-    return null;
-  }
-
-  const { username, name, url } = await userRepository.findById(found.userId);
-  return { ...found, username, name, url }; // post에 대한 데이터 + 사용자 정보를 더해서 준다.
-}
-
-export async function getAll() {
-  return Promise.all(
-    posts.map(async post => {
-      const { username, name, url } = await userRepository.findById(
-        post.userId
-      );
-      return { ...post, username, name, url };
-    })
-  );
-}
-
-export async function get(id) {
-  return posts.find(post => post.id === id);
+  return getPosts()
+    .findOne({ _id: new ObjectId(id) })
+    .then(data => mapOptionalPost(data));
 }
 
 export async function create(text, userId) {
+  const { username, name, url } = await userRepository.findById(userId);
+
   const post = {
-    id: Date.now().toString(), // post 고유 id
     text: text,
     createdAt: new Date(),
     userId: userId,
+    username: username,
+    name: name,
+    url: url,
   };
-
-  posts = [post, ...posts];
-  return getById(post.id);
+  return getPosts()
+    .insertOne(post)
+    .then(data => mapOptionalPost({ ...post, _id: data.insertedId }));
 }
 
 export async function update(id, text) {
-  const post = posts.find(post => post.id === id);
-  if (post) {
-    post.text = text;
-  }
-
-  return getById(post.id);
+  return getPosts()
+    .findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: { text: text },
+      },
+      { returnDocument: 'after' }
+    )
+    .then(data => mapOptionalPost(data));
 }
 
 export async function remove(id) {
-  posts = posts.filter(post => post.id !== id);
+  return getPosts().deleteOne({ _id: new ObjectId(id) });
+}
+
+function mapOptionalPost(post) {
+  return post ? { ...post, id: post._id.toString() } : post;
+}
+
+function mapPosts(posts) {
+  return posts.map(post => mapOptionalPost(post));
 }
