@@ -10,6 +10,8 @@ export default class HTTPClient {
       headers: { 'Content-Type': 'application/json', ...options.headers },
     });
 
+    console.log(res);
+
     // DELETE 메서드는 아무런것도 반환하지 않는다. 따라서 undefined가 반환될텐데 그 경우 json()을 이용해 오브젝트 변환이 안되 오류
 
     let data;
